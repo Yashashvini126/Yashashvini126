@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Books - Yashashvini Bookstore</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* BOOK GALLERY */
+
+        .book-gallery {
+            margin: 25px 0;
+        }
+
+        .book-gallery h2 {
+            color: #44318d;
+            margin-bottom: 8px;
+        }
+
+        .book-gallery p {
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 20px;
+        }
+
+        .gallery-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(70, 50, 140, 0.10);
+            transition: transform 0.2s;
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .gallery-card img {
+            width: 100%;
+            height: 190px;
+            object-fit: contain;
+            border-radius: 7px;
+            background: #f3f0ff;
+        }
+
+        .gallery-card h3 {
+            color: #44318d;
+            font-size: 15px;
+            margin: 12px 0 5px;
+        }
+
+        .gallery-card small {
+            color: #777;
+        }
+
+        .gallery-placeholder {
+            height: 190px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #6045c5, #3586d8);
+            color: white;
+            font-size: 55px;
+            border-radius: 7px;
+        }
+
+        .gallery-price {
+            color: #6045c5;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        @media(max-width: 600px) {
+            .gallery-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .gallery-card {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+
+        <h2>📚 Yashashvini</h2>
+
+        <p class="store-name">BOOKSTORE MANAGEMENT</p>
+
+        <a href="index.html">🏠 Dashboard</a>
+        <a href="books.html" class="active">📖 Manage Books</a>
+        <a href="customers.html">👥 Customers</a>
+        <a href="sales.html">🛒 Sales</a>
+
+        <div class="sidebar-bottom">
+            <p>Bookstore Management</p>
+            <small>Version 1.0</small>
+        </div>
+
+    </div>
+
+
+    <!-- MAIN CONTENT -->
+
+    <div class="main-content">
+
+        <header>
+            <div>
+                <h1>Manage Books</h1>
+                <p>Add, update and manage your bookstore inventory.</p>
+            </div>
+
+            <div class="admin">👤 Admin</div>
+        </header>
+
+
+        <!-- ADD BOOK FORM -->
+
+        <section class="book-form">
+
+            <h2 id="formTitle">➕ Add New Book</h2>
+
+            <form id="bookForm">
+
+                <input type="hidden" id="bookId">
+
+                <div class="form-grid">
+
+                    <div>
+                        <label>Book Title</label>
+                        <input
+                            type="text"
+                            id="title"
+                            placeholder="Enter book title"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label>Author</label>
+                        <input
+                            type="text"
+                            id="author"
+                            placeholder="Enter author name"
+                        >
+                    </div>
+
+                    <div>
+                        <label>Category</label>
+                        <input
+                            type="text"
+                            id="category"
+                            placeholder="Enter category"
+                        >
+                    </div>
+
+                    <div>
+                        <label>Price (₹)</label>
+                        <input
+                            type="number"
+                            id="price"
+                            placeholder="Enter price"
+                            min="0"
+                            step="0.01"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label>Quantity</label>
+                        <input
+                            type="number"
+                            id="quantity"
+                            placeholder="Enter quantity"
+                            min="0"
+                            step="1"
+                            required
+                        >
+                    </div>
+
+                </div>
+
+                <div class="form-buttons">
+
+                    <button
+                        type="submit"
+                        class="save-btn"
+                        id="saveBtn"
+                    >
+                        Add Book
+                    </button>
+
+                    <button
+                        type="button"
+                        class="cancel-btn"
+                        id="cancelBtn"
+                        hidden
+                    >
+                        Cancel Edit
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- BOOK COVER GALLERY -->
+
+        <section class="book-gallery">
+
+            <h2>📚 Explore Our Book Collection</h2>
+
+            <p>
+                Discover books available in Yashashvini Bookstore.
+            </p>
+
+            <div class="gallery-grid" id="bookGallery">
+
+                <p>Loading book covers...</p>
+
+            </div>
+
+        </section>
+
+
+        <!-- BOOK INVENTORY -->
+
+        <section class="book-list">
+
+            <div class="list-heading">
+
+                <div>
+                    <h2>📚 Book Inventory</h2>
+                    <p>All books stored in your bookstore.</p>
+                </div>
+
+                <input
+                    type="text"
+                    id="searchBook"
+                    placeholder="🔍 Search books..."
+                >
+
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Book Title</th>
+                            <th>Author</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="bookTable">
+
+                        <tr>
+                            <td colspan="8">Loading books...</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <footer>
+            © 2026 Yashashvini Bookstore Management System
+        </footer>
+
+    </div>
+
+
+    <script src="js/script.js"></script>
+
+</body>
+</html>

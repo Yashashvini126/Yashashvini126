@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Management - Yashashvini Bookstore</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .sales-content {
+            padding: 30px;
+        }
+
+        .sales-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+
+        .sales-card h2 {
+            margin-bottom: 20px;
+            color: #44318d;
+        }
+
+        .sales-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .sales-card label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 600;
+        }
+
+        .sales-card input,
+        .sales-card select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            margin-bottom: 15px;
+        }
+
+        .sales-btn {
+            background: #6045c5;
+            color: white;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 7px;
+            cursor: pointer;
+            margin: 5px 5px 5px 0;
+        }
+
+        .sales-btn:hover {
+            background: #4831a0;
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .sales-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .sales-table th,
+        .sales-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        .sales-table th {
+            background: #f1edff;
+            color: #44318d;
+        }
+
+        .total-display {
+            text-align: right;
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #44318d;
+        }
+
+        #salesMessage {
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        @media(max-width: 700px) {
+            .sales-content {
+                padding: 15px;
+            }
+
+            .sales-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <h2>Yashashvini</h2>
+        <p>Bookstore Management</p>
+
+        <ul>
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="books.html">Manage Books</a></li>
+            <li><a href="customers.html">Customers</a></li>
+            <li><a href="sales.html" class="active">Sales</a></li>
+        </ul>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content sales-content">
+
+        <h1>Sales Management</h1>
+        <p>Record and manage bookstore sales.</p>
+
+        <!-- CUSTOMER AND BOOK SELECTION -->
+        <section class="sales-card">
+            <h2>Record New Sale</h2>
+
+            <label for="saleCustomer">Select Customer</label>
+            <select id="saleCustomer">
+                <option value="">Loading customers...</option>
+            </select>
+
+            <div class="sales-grid">
+                <div>
+                    <label for="saleBook">Select Book</label>
+                    <select id="saleBook">
+                        <option value="">Loading books...</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="saleQuantity">Quantity</label>
+                    <input type="number" id="saleQuantity"
+                           min="1" value="1">
+                </div>
+            </div>
+
+            <button class="sales-btn" id="addItemBtn" type="button">
+                Add Book to Sale
+            </button>
+
+            <h2 style="margin-top:25px;">Selected Books</h2>
+
+            <div class="table-wrap">
+                <table class="sales-table">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartTable">
+                        <tr>
+                            <td colspan="5">No books added yet.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="total-display">
+                Total: ₹<span id="saleTotal">0.00</span>
+            </div>
+
+            <button class="sales-btn" id="recordSaleBtn" type="button">
+                Record Sale
+            </button>
+
+            <button class="sales-btn" id="clearSaleBtn" type="button">
+                Clear Sale
+            </button>
+
+            <p id="salesMessage"></p>
+        </section>
+
+        <!-- SALES HISTORY -->
+        <section class="sales-card">
+            <h2>Sales History</h2>
+
+            <div class="table-wrap">
+                <table class="sales-table">
+                    <thead>
+                        <tr>
+                            <th>Sale ID</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Total Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesHistory">
+                        <tr>
+                            <td colspan="4">Loading sales...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script>
+    let books = [];
+    let customers = [];
+    let cart = [];
+
+    const saleCustomer = document.getElementById('saleCustomer');
+    const saleBook = document.getElementById('saleBook');
+    const saleQuantity = document.getElementById('saleQuantity');
+    const cartTable = document.getElementById('cartTable');
+    const saleTotal = document.getElementById('saleTotal');
+    const salesMessage = document.getElementById('salesMessage');
+
+    // LOAD CUSTOMERS
+    async function loadSaleCustomers() {
+        try {
+            const response = await fetch('/api/customers');
+
+            if (!response.ok) {
+                throw new Error('Could not load customers.');
+            }
+
+            customers = await response.json();
+
+            saleCustomer.innerHTML =
+                '<option value="">Select Customer</option>';
+
+            customers.forEach(customer => {
+                const option = document.createElement('option');
+                option.value = customer.customer_id;
+                option.textContent = customer.name;
+                saleCustomer.appendChild(option);
+            });
+
+        } catch (error) {
+            saleCustomer.innerHTML =
+                '<option value="">Unable to load customers</option>';
+        }
+    }
+
+    // LOAD BOOKS
+    async function loadSaleBooks() {
+        try {
+            const response = await fetch('/api/books');
+
+            if (!response.ok) {
+                throw new Error('Could not load books.');
+            }
+
+            books = await response.json();
+
+            saleBook.innerHTML =
+                '<option value="">Select Book</option>';
+
+            books.filter(book => Number(book.quantity) > 0)
+                .forEach(book => {
+                    const option = document.createElement('option');
+                    option.value = book.book_id;
+                    option.textContent =
+                        `${book.title} - ₹${Number(book.price).toFixed(2)} (Stock: ${book.quantity})`;
+
+                    saleBook.appendChild(option);
+                });
+
+        } catch (error) {
+            saleBook.innerHTML =
+                '<option value="">Unable to load books</option>';
+        }
+    }
+
+    // ADD BOOK TO CART
+    document.getElementById('addItemBtn').addEventListener('click', () => {
+        const bookId = Number(saleBook.value);
+        const quantity = Number(saleQuantity.value);
+
+        const book = books.find(item =>
+            Number(item.book_id) === bookId
+        );
+
+        if (!book) {
+            alert('Please select a book.');
+            return;
+        }
+
+        if (!Number.isInteger(quantity) || quantity < 1) {
+            alert('Please enter a valid quantity.');
+            return;
+        }
+
+        const existingItem = cart.find(item =>
+            item.book_id === bookId
+        );
+
+        const alreadyAdded = existingItem
+            ? existingItem.quantity
+            : 0;
+
+        if (quantity + alreadyAdded > Number(book.quantity)) {
+            alert(`Only ${book.quantity} copies are available.`);
+            return;
+        }
+
+        if (existingItem) {
+            existingItem.quantity += quantity;
+        } else {
+            cart.push({
+                book_id: bookId,
+                title: book.title,
+                price: Number(book.price),
+                quantity: quantity
+            });
+        }
+
+        saleQuantity.value = 1;
+        saleBook.value = '';
+
+        displayCart();
+        salesMessage.textContent = '';
+    });
+
+    // DISPLAY CART
+    function displayCart() {
+        cartTable.innerHTML = '';
+
+        if (cart.length === 0) {
+            cartTable.innerHTML =
+                '<tr><td colspan="5">No books added yet.</td></tr>';
+        }
+
+        let total = 0;
+
+        cart.forEach((item, index) => {
+            const subtotal = item.price * item.quantity;
+            total += subtotal;
+
+            const row = document.createElement('tr');
+
+            const values = [
+                item.title,
+                '₹' + item.price.toFixed(2),
+                item.quantity,
+                '₹' + subtotal.toFixed(2)
+            ];
+
+            values.forEach(value => {
+                const cell = document.createElement('td');
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+
+            const actionCell = document.createElement('td');
+            const removeButton = document.createElement('button');
+
+            removeButton.textContent = 'Remove';
+            removeButton.className = 'remove-btn';
+
+            removeButton.addEventListener('click', () => {
+                cart.splice(index, 1);
+                displayCart();
+            });
+
+            actionCell.appendChild(removeButton);
+            row.appendChild(actionCell);
+            cartTable.appendChild(row);
+        });
+
+        saleTotal.textContent = total.toFixed(2);
+    }
+
+    // CLEAR SALE
+    document.getElementById('clearSaleBtn').addEventListener('click', () => {
+        cart = [];
+        displayCart();
+        saleCustomer.value = '';
+        salesMessage.textContent = '';
+    });
+
+    // RECORD SALE
+    document.getElementById('recordSaleBtn').addEventListener('click', async () => {
+        const customerId = Number(saleCustomer.value);
+
+        if (!customerId) {
+            alert('Please select a customer.');
+            return;
+        }
+
+        if (cart.length === 0) {
+            alert('Please add at least one book.');
+            return;
+        }
+
+        const button = document.getElementById('recordSaleBtn');
+        button.disabled = true;
+        button.textContent = 'Recording...';
+
+        try {
+            const response = await fetch('/api/sales', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    customer_id: customerId,
+                    items: cart.map(item => ({
+                        book_id: item.book_id,
+                        quantity: item.quantity
+                    }))
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Sale could not be recorded.');
+            }
+
+            alert(
+                'Sale recorded successfully!\n' +
+                'Sale ID: ' + result.sale_id +
+                '\nTotal: ₹' + Number(result.total_amount).toFixed(2)
+            );
+
+            cart = [];
+            displayCart();
+
+            saleCustomer.value = '';
+
+            await loadSaleBooks();
+            await loadSalesHistory();
+
+            salesMessage.textContent = 'Sale recorded successfully!';
+            salesMessage.style.color = 'green';
+
+        } catch (error) {
+            salesMessage.textContent = error.message;
+            salesMessage.style.color = 'red';
+
+        } finally {
+            button.disabled = false;
+            button.textContent = 'Record Sale';
+        }
+    });
+
+    // LOAD SALES HISTORY
+    async function loadSalesHistory() {
+        const history = document.getElementById('salesHistory');
+
+        try {
+            const response = await fetch('/api/sales');
+
+            if (!response.ok) {
+                throw new Error('Could not load sales.');
+            }
+
+            const sales = await response.json();
+
+            history.innerHTML = '';
+
+            if (sales.length === 0) {
+                history.innerHTML =
+                    '<tr><td colspan="4">No sales recorded yet.</td></tr>';
+                return;
+            }
+
+            sales.forEach(sale => {
+                const row = document.createElement('tr');
+
+                const values = [
+                    sale.sale_id,
+                    sale.customer_name || 'Unknown',
+                    sale.sale_date
+                        ? new Date(sale.sale_date).toLocaleDateString('en-IN')
+                        : '-',
+                    '₹' + Number(sale.total_amount).toFixed(2)
+                ];
+
+                values.forEach(value => {
+                    const cell = document.createElement('td');
+                    cell.textContent = value;
+                    row.appendChild(cell);
+                });
+
+                history.appendChild(row);
+            });
+
+        } catch (error) {
+            history.innerHTML =
+                '<tr><td colspan="4">Unable to load sales history.</td></tr>';
+        }
+    }
+
+    // LOAD PAGE DATA
+    loadSaleCustomers();
+    loadSaleBooks();
+    loadSalesHistory();
+</script>
+
+</body>
+</html>
